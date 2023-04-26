@@ -1,6 +1,5 @@
 package ru.cbgr.autotest.driver;
 
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import ru.cbgr.autotest.enums.Browsers;
 
@@ -11,7 +10,7 @@ import ru.cbgr.autotest.enums.Browsers;
 public class Driver {
     protected static RemoteWebDriver webDriver;
 
-    public static RemoteWebDriver getDriver(Browsers browserName) {
+    public static RemoteWebDriver initDriver(Browsers browserName) {
 
         switch (browserName) {
             case CHROME :

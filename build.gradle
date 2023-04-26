@@ -14,4 +14,9 @@ dependencies {
     implementation 'org.seleniumhq.selenium:selenium-java:4.8.1'
     implementation 'io.github.bonigarcia:webdrivermanager:3.2.0'
     implementation 'cglib:cglib:3.3.0'
+
+    // Spring
+    implementation 'com.google.inject:guice:5.1.0'
+    implementation 'com.google.inject.extensions:guice-testlib:4.1.0'
+
 }
