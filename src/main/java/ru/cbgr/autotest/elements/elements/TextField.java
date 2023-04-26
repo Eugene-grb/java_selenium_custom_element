@@ -5,42 +5,33 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 
 /**
- * A text field.
+ * Текстовое поле.
  **/
 public class TextField extends CustomWebElement {
-
     /**
-     * Constructor.
-     *
-     * @param webDriver The webDriver usd to interact with the webbrowser.
-     * @param by        The locator used to identify the element(s) on the website.
+     * @param webDriver Веб-драйвер, используемый для взаимодействия с веб-браузером.
+     * @param by        Локатор, используемый для идентификации элемента(ов) на сайте.
      **/
     public TextField(WebDriver webDriver, By by) {
         super(webDriver, by);
     }
 
-    /**
-     * Returns the text of this textfield.
-     *
-     * @return Returns the text of this textfield.
-     **/
+    /** @return Возвращает текст данного текстового поля **/
     public String getText() {
         return getAttribute("value");
     }
 
     /**
-     * Sets the text of this textfield.
+     * Вводит текст в текстовое поле.
      *
-     * @param text The text which should be inserted in this text field.
+     * @param text Текст, который должен быть вставлен в это текстовое поле.
      **/
     public void setText(String text) {
         getWebDriver().findElement(getBy()).clear();
         getWebDriver().findElement(getBy()).sendKeys(text);
     }
 
-    /**
-     * Tries to submit by pressing enter.
-     */
+    /** Пытается отправить сообщение, нажав клавишу Enter */
     public void submit() {
         getWebDriver().findElement(getBy()).sendKeys(Keys.ENTER);
     }

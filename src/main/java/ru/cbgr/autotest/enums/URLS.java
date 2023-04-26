@@ -5,12 +5,7 @@ package ru.cbgr.autotest.enums;
  */
 @SuppressWarnings("unused")
 public enum URLS {
-    // для запуска на удаленных средствах запуска
-    GRID_URL("localhost:4444", "GRID"),
-    SELENOID_URL("localhost:4444", "SELENOID"),
-
-    // тестовые стенды
-    TEST_STAND("tracking.cbgr.ru/consyst", "TEST");
+    TEST_STAND("localhost:4444", "TEST");
 
     private final String url;
     private final String standName;
@@ -20,18 +15,19 @@ public enum URLS {
         this.standName = standName;
     }
 
+    /** @return получить название текущего стенда */
     public String getStandName() {
         return standName;
     }
 
-    public String getRemoteUrl() {
-        return "http://" + url + "/wd/hub/";
-    }
-
+    /** @return получить полный url текущего стенда */
     public String getWebUiUrl() {
-        return "http://" + url + "/webui/index.html#/" ;
+        return "http://" + url + "/" ;
     }
 
+    /** Выполняет выбор стенда сравнивая входящую строку.
+     * Если нет совпадений, то запускается TEST_STAND по умолчанию
+     * @param standName название стенда */
     public static String getStandUrlFromString(String standName) {
         for (var stand : values())
             if (stand.standName.equalsIgnoreCase(standName))

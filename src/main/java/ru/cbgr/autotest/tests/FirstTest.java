@@ -1,8 +1,11 @@
 package ru.cbgr.autotest.tests;
 
 import com.google.inject.Inject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.cbgr.autotest.pages.BingPage;
+
+import java.util.Locale;
 
 public class FirstTest extends BaseTest {
 
@@ -11,10 +14,10 @@ public class FirstTest extends BaseTest {
 
     @Test
     void bingExampleTest() {
-        // Open the Bing page
+        // Открыть страницу Bing
         webDriver.get("https://www.bing.com/");
 
-        // Do the search and open result stuff
+        // Выполните поиск и откройте результат
         bingPage.search("Test");
     }
 }

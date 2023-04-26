@@ -4,22 +4,19 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 /**
- * A button.
+ * Кнопка
  **/
 public class Button extends CustomWebElement {
-
     /**
-     * Constructor.
-     *
-     * @param webDriver The webdriver usd to interact with the webbrowser.
-     * @param by        The locator used to identify the element(s) on the website.
+     * @param webDriver Веб-драйвер, используемый для взаимодействия с веб-браузером.
+     * @param by        Локатор, используемый для идентификации элемента(ов) на сайте.
      **/
     public Button(WebDriver webDriver, By by) {
         super(webDriver, by);
     }
 
      /**
-     * Clicks on the button.
+     * Нажатие на кнопку.
      **/
     public void click() {
         getWebDriver().findElement(getBy()).click();

@@ -15,56 +15,41 @@ import ru.cbgr.autotest.elements.elements.CustomWebElement;
 import java.lang.reflect.Field;
 
 /*
- * Good sources:
- * http://www.alechenninger.com/2014/07/a-case-study-of-javas-dynamic-proxies_14.html
- * http://www.mograblog.com/2013/08/extending-selenium-in-java.html
- */
-
-/*
- * Short summary:
- * The page factory runs through all fields of a class an calls the "decorate()" method of the "FieldDecorator" interface.
- * The "decorate()" method has to return an object which has the correct type.
+ * Краткое описание:
+ * Фабрика страниц проходит по всем полям класса и вызывает метод "decorate()" интерфейса "FieldDecorator".
+ * Метод "decorate()" должен возвращать объект, имеющий правильный тип.
+ *
+ * Для этого ему нужен локатор поля, чтобы веб-элемент можно было идентифицировать.
  * 
- * For that it needs the locator of the field so that the webelement can be identified on the website.
+ * Это должно работать следующим образом:
  * 
- * It should work like this:
- * 
- * Page class should be instantiated -> PageFactory.init() -> decorate() for each field
- * 		choice 1: decorate for a default webelement: DefaultFieldDecorator is used for default behavior
- * 		choice 2: decorate has create proper custom webelement -> getLocator() to be able do get the webelement
- * 			-> getEnhancedObject() to add callback method to lazy initialize and configure the custom webelement
- * 			-> getElementHandler(), which implements the callback method to add callback method to lazy initialize and configure the custom webelement.
+ * Класс Page должен быть инстанцирован -> PageFactory.init() -> decorate() для каждого поля
+ * выбор 1: декорировать для веб-элемента по умолчанию: DefaultFieldDecorator используется для поведения по умолчанию
+ * выбор 2: декорирование создает соответствующий пользовательский веб-элемент -> getLocator(), чтобы иметь возможность получить веб-элемент
+ * -> getEnhancedObject() для добавления метода обратного вызова для ленивой инициализации и настройки пользовательского веб-элемента
+ * -> getElementHandler(), который реализует метод обратного вызова, чтобы добавить метод обратного вызова для ленивой инициализации и настройки пользовательского веб-элемента.
  * */
 
 /**
- * Idea and code (partly) was taken from: http://www.mograblog.com/2013/08/extending-selenium-in-java.html.
- * <p>
- * An implementation of a FieldDecorator to enable the usage of custom webelements via a page factory.
- * Custom webelements will be created via lazy initialisation.
+ * Реализация FieldDecorator для обеспечения возможности использования пользовательских веб-элементов через фабрику страниц.
+ * Пользовательские веб-элементы будут создаваться с помощью ленивой инициализации.
  **/
 public class CustomElementFieldDecorator implements FieldDecorator {
-
-    /**
-     * The decorator which is used when a default WebElement is used and the default behavior can be used.
-     **/
+    /** Декоратор, который используется, когда используется WebElement и поведение по умолчанию */
     private final DefaultFieldDecorator defaultFieldDecorator;
 
-    /**
-     * The search context for the (custom) webelement. Mostly the webdriver.
-     **/
+    /** Контекст поиска пользовательского веб-элемента. В основном это веб-драйвер **/
     private final SearchContext searchContext;
 
-    /**
-     * The webdriver.
-     **/
+    /** веб-драйвер **/
     private final WebDriver webDriver;
 
     /**
-     * The constructor. It constructs.
+     * Конструктор
      *
-     * @param searchContext The search context for the (custom) webelement. Mostly just a webdriver object.
-     *                      Used to find webelements on a webpage.
-     * @param webDriver     The webDriver which will be used to create the webelement.
+     * @param searchContext Контекст поиска для (пользовательского) веб-элемента. В основном просто объект webdriver.
+     *                      Используется для поиска веб-элементов на веб-странице.
+     * @param webDriver     Веб-драйвер, который будет использоваться для создания веб-элемента.
      **/
     public CustomElementFieldDecorator(SearchContext searchContext, WebDriver webDriver) {
         this.searchContext = searchContext;
@@ -73,55 +58,55 @@ public class CustomElementFieldDecorator implements FieldDecorator {
     }
 
     /**
-     * This method is called by the Selenium PageFactory on all fields to decide how to decorate the field.
+     * Этот метод вызывается Selenium PageFactory для всех полей, чтобы решить, как декорировать поле.
      *
-     * @param loader The class loader that was used for the page object
-     * @param field  The field which should be decorated. Should be an FindBy annotated (custom) webelement.
-     * @return Value to decorate the field with.
+     * @param loader Загрузчик класса, который был использован для объекта страницы
+     * @param field  Поле, которое должно быть декорировано. Это должен быть аннотированный (пользовательский) веб-элемент FindBy.
+     * @return Значение, которым будет украшено поле.
      **/
     @Override
     public Object decorate(ClassLoader loader, Field field) {
-        // If it is a custom annotated webelement, then ensure proper initialisation via the adding of the callback method
+        // Если это пользовательский аннотированный веб-элемент, вызвать инициализацию обертки
         if (CustomWebElement.class.isAssignableFrom(field.getType())  && field.isAnnotationPresent(FindBy.class)) {
             return getEnhancedObject(field.getType(), getElementHandler(field), field.getAnnotation(FindBy.class));
         }
-        // If it is a normal webelement, then use the default FieldDecorator implementation
+        // Если это обычный веб-элемент, то используйте реализацию FieldDecorator по умолчанию
         else {
             return defaultFieldDecorator.decorate(loader, field);
         }
     }
 
     /**
-     * Creates the class with the callback method. The callback method will be called when a method is called on
-     * the given field object (e.g. a click() method call on a button).
+     * Создает класс с методом обратного вызова. Метод будет вызываться для
+     * данного объекта поля (например, вызов метода click() на кнопке).
      *
-     * @return The class which contains the callback method.
+     * @return Класс, содержащий метод обратного вызова.
      **/
     private CustomElementLocator getElementHandler(Field field) {
         return new CustomElementLocator(getLocator(field));
     }
 
     /**
-     * Returns the element handler for the field which melds the field and the locator (aka FindBy) together for further
-     * usage. An ElementLocator locator can find a webelement on a webpage without any parameters since all the needed information
-     * is already there.
+     * Возвращает обработчик элемента для поля, который объединяет поле и локатор (он же FindBy) для дальнейшего использования.
+     * Локатор ElementLocator может найти веб-элемент на веб-странице без каких-либо параметров, так как вся необходимая информация
+     * уже есть.
      *
-     * @param field The annotated field from which the element locator will be created.
-     * @return The element locator object.
+     * @param field Аннотированное поле, на основе которого будет создан локатор элемента.
+     * @return Объект локатора элемента.
      **/
     private ElementLocator getLocator(Field field) {
         return new DefaultElementLocatorFactory(searchContext).createLocator(field);
     }
 
     /**
-     * Enhances the class to call a specific method callback when a method of that class is called. Example: A button is
-     * clicked -> Since the class might be a custom webelement, the callback method is called to handle the
-     * initialisation of the custom webelement.
+     * Класс для вызова обертки для кастомных элементов.
+     * Пример: Кнопка нажата -> Поскольку класс может быть пользовательским веб-элементом,
+     * метод вызывает внутренний метод этой обертки.
      *
-     * @param clzz              The class which should be enhanced with the callback method (e.g. a custom button). If a method in
-     *                          that class is called, the callback method will be triggered.
-     * @param methodInterceptor The class which implements the callback method.
-     * @param locator           The locator which was used to identify the webelement via the FindBy annotation.
+     * @param clzz              Класс, который должен быть дополнен методом обратного вызова (например, кнопка).
+     *                          Если метод этого класса будет вызван, то выполнится метод этой кнопки.
+     * @param methodInterceptor Класс, реализующий метод обратного вызова.
+     * @param locator           Локатор, который был использован для идентификации веб-элемента с помощью аннотации FindBy.
      **/
     private Object getEnhancedObject(Class<?> clzz, MethodInterceptor methodInterceptor, FindBy locator) {
         Enhancer e = new Enhancer();

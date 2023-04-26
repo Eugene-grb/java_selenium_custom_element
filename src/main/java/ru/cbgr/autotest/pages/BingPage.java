@@ -1,25 +1,30 @@
 package ru.cbgr.autotest.pages;
 
-
+import com.google.inject.Inject;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import ru.cbgr.autotest.elements.decorator.CustomElementFieldDecorator;
+import ru.cbgr.autotest.pages.config.BasePage;
 import ru.cbgr.autotest.steps.BingSearchSteps;
 
 /**
- * The Bing page object.
- * In order to keep this example simple, this page object contains both the search logic and the result list logic.
+ * Объект страницы Bing.
  **/
 public class BingPage extends BasePage {
-
     /**
-     * Includes the bing search module in this page.
-     * If the custom webelement does not use the given locator, you can simply insert what you want.
+     * Включает шаги поиска bing в эту страницу.
+     * Если пользовательский веб-элемент не использует заданный локатор,
+     * то можно просто вставить любой текст.
      **/
-    @FindBy(id = "module")
+    @FindBy(id = "steps")
     private BingSearchSteps searchSteps;
 
-
+    /**
+     * выполнить поиск исходя из заданного текста
+     * @param searchText текст для поиска
+     */
     public void search(String searchText) {
         searchSteps.search(searchText);
     }
-
 }

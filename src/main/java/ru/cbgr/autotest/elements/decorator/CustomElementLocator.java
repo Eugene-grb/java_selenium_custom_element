@@ -15,80 +15,67 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
- * This class creates handles the calls of methods of custom webelements.
+ * Этот класс обрабатывает вызовы методов пользовательских веб-элементов.
  **/
 public class CustomElementLocator implements MethodInterceptor {
-
-    /**
-     * The locator to get the webelement from the webpage.
-     **/
+    /** Локатор для получения веб-элемента с веб-страницы **/
     private final ElementLocator locator;
 
-    /**
-     * The constructor.
-     *
-     * @param locator The locator to get the webelement from the webpage.
-     **/
     public CustomElementLocator(ElementLocator locator) {
         this.locator = locator;
     }
 
     /**
-     * Handles the method calls to a custom webelement.
+     * Обрабатывает вызовы методов для пользовательского веб-элемента.
      *
-     * @param o           The object from which the method was called.
-     * @param method      The called method.
-     * @param objects     The parameter object of the value.
-     * @param methodProxy Used to call the method of the superclass.
+     * @param o           Объект, из которого был вызван метод.
+     * @param method      Вызванный метод.
+     * @param objects     Объект параметра, содержащий значение.
+     * @param methodProxy Используется для вызова метода суперкласса.
      **/
     @Override
     public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-        // Configure a custom webelement (WebButton etc.)
+        // Настройка пользовательского веб-элемента (WebButton и т.д.)
         if (o instanceof CustomWebElement) {
-            // Invokes the method of the original object
+            // Вызывает метод исходного объекта
             try {
                 return methodProxy.invokeSuper(o, objects);
             } catch (InvocationTargetException e) {
                 throw e.getCause();
             }
         }
-        // Configure a normal webelement
-        // Should never be called in the current usecase because it gets handled in the CustomElementFieldDecorator class
+        // Настройка обычного веб-элемента
+        // Никогда не должен вызываться в текущем сценарии использования, поскольку он обрабатывается в классе CustomElementFieldDecorator
         else if (o instanceof WebElement) {
-            // Only handle first displayed
-            // Get the first default webelement which matches the locator
-            WebElement displayedElement = locateElement();
+            // Обработка только первого отображаемого элемента
+            // Получение первого веб-элемента по умолчанию, который соответствует локатору
+            var displayedElement = locateElement();
 
-            if (displayedElement != null) {
-                return method.invoke(displayedElement, objects);
-            }
-            else {
-                return methodProxy.invokeSuper(o, objects);
-            }
+            if (displayedElement != null) return method.invoke(displayedElement, objects);
+            else return methodProxy.invokeSuper(o, objects);
         }
 
         return null;
     }
 
     /**
-     * Get an instance of the webelement.
+     * Получение экземпляра веб-элемента.
      *
-     * @return Returns a proxy element which implements the webelement.
-     * This is needed to call the isVisible and other methods on itself (the custom web element)
-     * without getting a nasty exception.
+     * @return Возвращает прокси-элемент, который реализует данный веб-элемент.
+     *  Это необходимо для вызова isVisible и других методов на самом себе (пользовательском веб-элементе) без получения исключения.
      **/
     private WebElement locateElement() {
         return proxyForLocator(ElementLocator.class.getClassLoader(), locator);
     }
 
     /**
-     * Creates a dynamic proxy element for a webelement.
-     * Stolen form the DefaultFieldDecorator.class class in the Selenium lib.
-     * Further information on Proxies: https://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Proxy.html
+     * Создает динамический прокси-элемент для веб-элемента.
+     * Украден из класса DefaultFieldDecorator.class в Selenium lib.
+     * @link <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Proxy.html">Proxy</a>
      *
-     * @param loader  The class loader used to create the proxy.
-     * @param locator The element locator used to locate the webelement.
-     * @return The proxy webelement.
+     * @param loader  Загрузчик классов, используемый для создания прокси.
+     * @param locator Локатор элемента, используемый для определения местоположения веб-элемента.
+     * @return Веб-элемент прокси.
      **/
     private WebElement proxyForLocator(ClassLoader loader, ElementLocator locator) {
         InvocationHandler handler = new LocatingElementHandler(locator);

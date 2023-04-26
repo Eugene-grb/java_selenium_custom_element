@@ -7,112 +7,68 @@ import ru.cbgr.autotest.elements.decorator.CustomElementFieldDecorator;
 import ru.cbgr.autotest.elements.decorator.WebElementTransformer;
 
 /**
- * Parent class for all complex web elements.
+ * Родительский класс для всех кастомных веб-элементов.
  **/
 public abstract class CustomWebElement {
-
-    /**
-     * The webDriver which can be used in subclasses.
-     **/
+    /** Веб-драйвер, который может быть использован в наследниках **/
     private WebDriver webDriver;
 
-    /**
-     * The locator through which the element(s) used for an action will be identified.
-     **/
+    /** Локатор, с помощью которого будет идентифицирован элемент(ы), используемый(ые) для действия **/
     private By locator;
 
-    /**
-     * Used to access the locators of a webelement.
-     * **/
+    /** Используется для доступа к локаторам веб-элемента **/
     private WebElementTransformer transformer;
 
     /**
-     * Constructor.
-     *
-     * @param webDriver The webDriver used to interact with the webbrowser.
-     * @param by        The locator used to identify the element(s) on the website.
+     * @param webDriver Веб-драйвер, используемый для взаимодействия с веб-браузером.
+     * @param by        Локатор, используемый для идентификации элемента(ов) на сайте.
      **/
     public CustomWebElement(WebDriver webDriver, By by) {
         this.webDriver = webDriver;
         locator = by;
         transformer = new WebElementTransformer();
 
-        // Call the page factory on this object to initialize custom webelements in custom webelements (aka nesting)
+        // Вызов фабрики страниц на этом объекте для инициализации пользовательских
+        // веб-элементов в пользовательских веб-элементах (так называемая вложенность)
         PageFactory.initElements(new CustomElementFieldDecorator(webDriver, webDriver), this);
     }
 
-    /**
-     * Returns the locator to identify the element(s) on the website.
-     *
-     * @return Returns the locator to identify the element(s) on the website.
-     **/
+    /** @return Возвращает локатор для идентификации элемента(ов) на сайте **/
     public By getBy() {
         return locator;
     }
 
     /**
-     * The element must be visible in order to retrieve its attribute.
-     * Get the value of a the given attribute of the element. Will return the current value, even if
-     * this has been modified after the page has been loaded. More exactly, this method will return
-     * the value of the given attribute, unless that attribute is not present, in which case the value
-     * of the property with the same name is returned (for example for the "value" property of a
-     * textarea element). If neither value is set, null is returned. The "style" attribute is
-     * converted as best can be to a text representation with a trailing semi-colon. The following are
-     * deemed to be "boolean" attributes, and will return either "true" or null:
-     * <p>
-     * async, autofocus, autoplay, checked, compact, complete, controls, declare, defaultchecked,
-     * defaultselected, defer, disabled, draggable, ended, formnovalidate, hidden, indeterminate,
-     * iscontenteditable, ismap, itemscope, loop, multiple, muted, nohref, noresize, noshade,
-     * novalidate, nowrap, open, paused, pubdate, readonly, required, reversed, scoped, seamless,
-     * seeking, selected, spellcheck, truespeed, willvalidate
-     * <p>
-     * Finally, the following commonly mis-capitalized attribute/property names are evaluated as
-     * expected:
-     * <p>
-     * <ul>
-     * <li>"class"
-     * <li>"readonly"
-     * </ul>
+     * Получить значение заданного атрибута элемента. Возвращает текущее значение, даже если
+     * оно было изменено после загрузки страницы.
      *
-     * @param attributeName The name of the attribute.
-     * @return The attribute/property's current value or null if the value is not set.
+     * @param attributeName Имя атрибута.
+     * @return Текущее значение атрибута/свойства или null, если значение не установлено.
      */
     public String getAttribute(String attributeName) {
         return getWebDriver().findElement(getBy()).getAttribute(attributeName);
     }
 
-    /**
-     * Returns the module to transform stuff.
-     *
-     * @return Returns the module to transform stuff.
-     **/
+    /** @return Возвращает модуль для преобразования элемента **/
     protected WebElementTransformer transformer() {
         return transformer;
     }
 
-    /**
-     * Returns the webDriver.
-     *
-     * @return Returns the webDriver.
-     **/
+    /** @return Возвращает веб-драйвер **/
     protected WebDriver getWebDriver() {
         return webDriver;
     }
 
-    /**
-     * Returns the used type of a given by locator.
-     *
-     * @return Returns the used type of a given by locator.
-     **/
+    /** @return Возвращает используемый тип заданного локатора **/
     protected WebElementTransformer.LocatorType getLocatorType() {
         return transformer.getLocatorType(getBy());
     }
 
     /**
-     * Returns the locator value of a locator.
+     * Возвращает значение локатора.
      *
-     * @param type The type of the locator.
-     * @return The value of the locator.
+     * @param type Тип локатора.
+     * @return Значение локатора.
      **/
     protected String getLocatorValue(WebElementTransformer.LocatorType type) {
         return transformer.getLocatorValue(getBy(), type);

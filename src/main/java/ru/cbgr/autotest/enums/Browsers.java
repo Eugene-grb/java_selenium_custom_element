@@ -19,7 +19,9 @@ public enum Browsers {
         return String.valueOf(this.browserName);
     }
 
-    /** Возврат значения константы по строковому значению константы */
+    /** Выполняет выбор браузера для запуска сравнивая входящую строку.
+     * Если нет совпадений, то запускается Chrome
+     * @param browserName название браузера */
     public static Browsers fromString(String browserName) {
         for(var browser : Browsers.values())
             if (browserName.equalsIgnoreCase(browser.browserName))

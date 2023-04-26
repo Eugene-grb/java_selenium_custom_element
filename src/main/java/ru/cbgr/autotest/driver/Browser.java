@@ -10,13 +10,12 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
+ * Настройки браузеров
  * @author Evgeny Gribanov
  * @version 30.01.2023
  * @link egribanov@cbgr.ru
  */
 public abstract class Browser extends Driver {
-
-
     /** Возвращает экземпляр вебдрайвера для запуска Google Chrome */
     public static DesiredCapabilities getChromeRemoteWebDriver() {
         // инициализация нужной версии вебдрайвера в зависимости от установленной версии браузера
