@@ -2,12 +2,16 @@ package ru.cbgr.autotest.driver;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverLogLevel;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
+
+import java.io.OutputStream;
 
 /**
  * Настройки браузеров
@@ -33,7 +37,14 @@ public abstract class Browser extends Driver {
         var capabilities = new DesiredCapabilities();
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
-        webDriver = new ChromeDriver(options);
+        // выключаем лишнее логирование драйвера
+        var chromeDriverService = new ChromeDriverService.Builder()
+                .withSilent(true).build();
+        chromeDriverService.sendOutputTo(new OutputStream() {
+            @Override public void write(int b){}
+        });
+
+        webDriver = new ChromeDriver(chromeDriverService, options);
         return capabilities;
     }
 
