@@ -27,6 +27,8 @@ public abstract class Browser extends Driver {
 
         options.addArguments("--incognito");
         options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--disable-logging");
+        options.addArguments("--log-level=3");
 
         var capabilities = new DesiredCapabilities();
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);

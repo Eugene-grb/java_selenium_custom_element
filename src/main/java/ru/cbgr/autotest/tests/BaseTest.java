@@ -33,10 +33,11 @@ public abstract class BaseTest {
      */
     @BeforeAll
     void setUp() {
-        var module = new PageBinding(); // привязать все объекты
+        PageBinding module = new PageBinding(); // привязать все объекты
         injector = Guice.createInjector(module); // создать инжектор для внедрения
         injector.injectMembers(this); // внедрить в текущий тест необходимые объекты
         webDriver.manage().timeouts().implicitlyWait(DURATION_TIMEOUT);  // Включить неявное ожидание
+
     }
 
     /** Выполнить закрытие веб драйвера по окончании всех тестов */
